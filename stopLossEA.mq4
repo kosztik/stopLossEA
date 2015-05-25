@@ -51,10 +51,11 @@ void slSet() {
     */
       if (orderType == OP_BUY) {
       
-         slBuy =  iHigh(orderSymbol,PERIOD_M15,1) - Kv*iATR(orderSymbol,0,ATRperiod,1);
+         slBuy = MathMax( iHigh(orderSymbol,PERIOD_M15,1) - Kv*iATR(orderSymbol,0,ATRperiod,1), iHigh(orderSymbol,PERIOD_M15,2) - Kv*iATR(orderSymbol,0,ATRperiod,2) );
+         // MathMax( smin[shift], High[shift+i] - Kv*iATR(NULL,0,ATRperiod,shift+i)); 
          // if (atrstop < StopLevel) slBuy = StopLevel
       
-         //Print ("SL beáll: ", ", ", iHigh(orderSymbol,PERIOD_M15,1) - Kv*iATR(orderSymbol,0,ATRperiod,1));
+         Print ("Market: ", StopLevel, ", ATRsL: ", Kv,", " ,iATR(orderSymbol,0,ATRperiod,1), ", ",Kv*iATR(orderSymbol,0,ATRperiod,1) );
          //Print (StopLevel,", ", High[1] - Kv*iATR(orderSymbol,0,ATRperiod,1));
       
          bool res=OrderModify(OrderTicket(),OrderOpenPrice(), slBuy,OrderTakeProfit(),0,Blue);
@@ -71,7 +72,8 @@ void slSet() {
     if (orderType == OP_SELL) {
     
       
-      slSell =  iLow(orderSymbol,PERIOD_M15,1) + Kv*iATR(orderSymbol,0,ATRperiod,1);
+      slSell =  MathMin( iLow(orderSymbol,PERIOD_M15,2) + Kv*iATR(orderSymbol,0,ATRperiod,2), iLow(orderSymbol,PERIOD_M15,1) + Kv*iATR(orderSymbol,0,ATRperiod,1) );
+      //  MathMin( smax[shift], Low[shift+i] + Kv*iATR(NULL,0,ATRperiod,shift+i));
       bool res=OrderModify(OrderTicket(),OrderOpenPrice(), slSell,OrderTakeProfit(),0,Red);
          if(!res) 
          {

@@ -20,7 +20,7 @@ int Button1,Button2,Button3,panel;
 
 int Size=0,cnt,orderType,StopLevel,flipflop=0,flipflop2=0,Size_now,pipSzorzo;
 string orderSymbol;
-double smin,smax,slSell,slBuy,digits,haOpenPrev,haClosePrev;
+double smin,smax,slSell,slBuy,digits,haOpenPrev,haClosePrev,haOpen,haClose;
 
 // Settings
 int GUIX = 50;
@@ -76,15 +76,17 @@ void tpSet()
       string orderSymbol2=OrderSymbol(); // DEvizapár
       double haOpenPrev=NormalizeDouble(iCustom(orderSymbol,PERIOD_M15,"Heiken_Ashi_Smoothed",0,5,1),5);
       double haClosePrev=NormalizeDouble(iCustom(orderSymbol,PERIOD_M15,"Heiken_Ashi_Smoothed",0,6,1),5);
-      
-      Print(orderSymbol2,",",orderType2,": ", haOpenPrev, "/", haClosePrev);
+      double haOpen=NormalizeDouble(iCustom(orderSymbol,PERIOD_M15,"Heiken_Ashi_Smoothed",0,5,0),5);
+      double haClose=NormalizeDouble(iCustom(orderSymbol,PERIOD_M15,"Heiken_Ashi_Smoothed",0,6,0),5);
+
+      Print(orderSymbol2,",",orderType2,": ",haOpenPrev,"/",haClosePrev);
       // most megvizsgáljuk a jelenlegi trade-t
       if(orderType2==OP_BUY)
         {
          // ha buy, akkor úgy kell kilépni, ha az elõzõ HA gyertya már csökkenõ volt
-         if(haOpenPrev<haClosePrev)
-           {
-            // az elõzõ HA gyertya piros. Zárnunk kell.
+         if(haOpenPrev<haClosePrev && haOpen<haClose)
+
+           {            // az elõzõ HA gyertya piros. Zárnunk kell.
             bool res2=OrderClose(OrderTicket(),OrderLots(),Ask,3,Green);
             if(!res2)
               {
@@ -98,9 +100,9 @@ void tpSet()
         }
       if(orderType2==OP_SELL)
         {
-        
+
          // ha sell, akkor úgy kell kilépni, ha az elõzõ HA gyertya növekvõ volt.
-         if(haOpenPrev>haClosePrev)
+         if(haOpenPrev>haClosePrev && haOpen>haClose)
            {
             // az elõzõ HA gyertya zöld. Zárnunk kell.
             bool res2=OrderClose(OrderTicket(),OrderLots(),Bid,3,Green);
